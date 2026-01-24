@@ -40,7 +40,7 @@
         }
 
         /* =========================================
-           INTERACTIVE HERO SECTION
+           HERO SECTION (CSS Animation)
            ========================================= */
         .hero-section {
             height: 80vh;
@@ -57,6 +57,7 @@
             background: linear-gradient(to bottom, #fff, #444);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            /* Animation */
             opacity: 0;
             transform: translateY(50px);
             animation: heroReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -66,8 +67,17 @@
             font-size: 1.5rem;
             color: var(--text-muted);
             margin-top: 20px;
+            /* Animation */
             opacity: 0;
             animation: fadeUp 1s ease 0.5s forwards;
+        }
+
+        .btn-group { 
+            margin-top: 40px; 
+            display: flex; 
+            gap: 15px; 
+            opacity: 0; 
+            animation: fadeUp 1s ease 0.8s forwards; 
         }
 
         /* =========================================
@@ -87,7 +97,12 @@
             position: relative;
             overflow: hidden;
             transition: transform 0.1s;
-            /* For the spotlight effect */
+            margin-bottom: 24px;
+            
+            /* FIX: Make sure it's visible by default */
+            opacity: 1; 
+            
+            /* Spotlight Variables */
             --mouse-x: 0px;
             --mouse-y: 0px;
         }
@@ -112,13 +127,11 @@
             opacity: 1;
         }
         
-        /* Content sits on top of glow */
         .card-content {
             position: relative;
             z-index: 2;
         }
 
-        /* 3D TILT SPECIFIC (For Dashboard) */
         #tilt-card {
             transform-style: preserve-3d;
             perspective: 1000px;
@@ -174,13 +187,12 @@
         .progress-bar {
             height: 100%;
             background: #fff;
-            width: 0%;
+            width: 0%; /* JS will fill this */
             box-shadow: 0 0 10px rgba(255,255,255,0.5);
             transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         /* BUTTONS */
-        .btn-group { margin-top: 40px; display: flex; gap: 15px; opacity: 0; animation: fadeUp 1s ease 0.8s forwards; }
         .btn {
             padding: 14px 28px;
             border-radius: 100px;
@@ -194,7 +206,7 @@
         .btn-ghost { border: 1px solid #333; color: #fff; }
         .btn-ghost:hover { border-color: #fff; }
 
-        /* TAGS */
+        /* SKILL TAGS */
         .skill-tag {
             border: 1px solid #333;
             color: #ccc;
@@ -218,14 +230,7 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 164, 79, 0); }
         }
 
-        /* SCROLL REVEAL CLASS */
-        .reveal {
-            opacity: 0;
-            transform: translateY(40px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
+        /* RESPONSIVE */
         @media (max-width: 768px) {
             .hero-text { font-size: 20vw; }
             .metric-row { flex-direction: column; }
@@ -250,83 +255,5 @@
         </div>
     </section>
 
-    <section class="container reveal">
+    <section class="container">
         <h2 class="section-title">System <span>Velocity</span></h2>
-        
-        <div class="interactive-card" id="tilt-card">
-            <div class="card-content">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
-                    <div>
-                        <h3 style="font-size: 1.5rem;">Engineering Output</h3>
-                        <p style="color: var(--text-muted); margin-top: 5px;">Live Telemetry</p>
-                    </div>
-                    <div class="status-badge">
-                        <div class="pulse"></div>
-                        Online
-                    </div>
-                </div>
-
-                <div class="metric-row">
-                    <div style="flex: 1; min-width: 250px;">
-                        <img src="https://github-readme-stats.vercel.app/api?username=ananth9911&show_icons=true&theme=dark&bg_color=00000000&hide_border=true&title_color=ffffff&text_color=cccccc&icon_color=2ea44f" 
-                             style="width: 100%; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));" alt="Stats">
-                    </div>
-                    <div style="flex: 1; min-width: 200px; display: flex; justify-content: center; align-items: center;">
-                        <img src="https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/topic_breakdown.png" 
-                             style="width: 100%; max-width: 200px; border-radius: 12px; opacity: 0.9;" alt="Focus Areas">
-                    </div>
-                </div>
-
-                <div style="margin-top: 40px;">
-                    <p style="color: #666; font-size: 0.8rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Daily Activity Log</p>
-                    <img src="https://ghchart.rshah.org/2ea44f/ananth9911" 
-                         style="width: 100%; opacity: 0.9;" alt="Heatmap">
-                </div>
-
-                <div class="progress-container">
-                    <div class="progress-bar" id="p-bar"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="container reveal">
-        <h2 class="section-title">Career <span>History</span></h2>
-        
-        <div class="card-grid">
-            <div class="interactive-card">
-                <div class="card-content">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <h3 style="font-size: 1.5rem;">Software Engineer I</h3>
-                        <span style="color: var(--text-muted);">2024 — Present</span>
-                    </div>
-                    <p style="color: var(--text-muted); line-height: 1.7;">
-                        Architecting data pipelines and deriving marketing insights for global retail giants. 
-                        Optimizing high-velocity data flow for critical business decisions.
-                    </p>
-                </div>
-            </div>
-
-            <div class="interactive-card">
-                <div class="card-content">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <h3 style="font-size: 1.5rem;">Analyst</h3>
-                        <span style="color: var(--text-muted);">2022 — 2023</span>
-                    </div>
-                    <p style="color: #fff; margin-bottom: 10px;">Tredence Inc.</p>
-                    <p style="color: var(--text-muted); line-height: 1.7;">
-                        Executed data engineering tasks and supported customer analytics initiatives. 
-                        Built visualization layers for stakeholder reporting.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="container reveal" style="padding-bottom: 100px;">
-        <h2 class="section-title">Technical <span>Builds</span></h2>
-        
-        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-            
-            <div class="interactive-card">
-                <div

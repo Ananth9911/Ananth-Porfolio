@@ -3,250 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ananth | Software Engineer & Competitive Coder</title>
+    <title>Ananth | Software Engineer</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         /* =========================================
-           1. MODERN CSS VARIABLES & RESET
+           1. STATE OF THE ART DESIGN SYSTEM
            ========================================= */
         :root {
-            --primary: #2ea44f;       /* GitHub Green */
-            --primary-dark: #22863a;
-            --dark: #24292e;          /* GitHub Dark */
-            --light-bg: #f6f8fa;
-            --white: #ffffff;
-            --text-main: #24292e;
-            --text-muted: #586069;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
-            --radius: 12px;
+            --bg-deep: #050505;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.07);
+            --primary: #00f260; /* Neon Green */
+            --primary-dim: rgba(0, 242, 96, 0.1);
+            --accent: #0575E6;  /* Electric Blue */
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: blur(20px);
         }
 
         body {
             margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
             color: var(--text-main);
-            background-color: var(--white);
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
-        h1, h2, h3 { margin: 0; font-weight: 800; }
-        a { text-decoration: none; color: inherit; transition: 0.2s; }
-        ul { padding-left: 20px; }
+        /* DYNAMIC BACKGROUND (Subtle Gradient Mesh) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(5, 117, 230, 0.08), transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        h1, h2, h3, h4 { font-family: 'Space Grotesk', sans-serif; margin: 0; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
         
-        /* CONTAINER UTILITY */
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 24px;
         }
 
-        /* CARD COMPONENT */
-        .card {
-            background: var(--white);
-            border: 1px solid #e1e4e8;
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            transition: transform 0.2s, box-shadow 0.2s;
+        /* =========================================
+           2. ANIMATIONS & INTERACTIVITY
+           ========================================= */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow);
+
+        .animate-in {
+            animation: fadeUp 0.6s ease-out forwards;
+            opacity: 0; /* Hidden initially */
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* GLASS CARDS */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .glass-card:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* SKILL TAGS */
+        .tech-pill {
+            display: inline-block;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin: 0 6px 8px 0;
+            color: #ddd;
+            transition: 0.3s;
+        }
+        .tech-pill:hover {
+            background: var(--primary-dim);
+            color: var(--primary);
             border-color: var(--primary);
         }
 
-        /* BADGES */
-        .badge {
-            display: inline-block;
-            background: #e1e4e8;
-            color: var(--text-main);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-right: 6px;
-            margin-bottom: 6px;
+        /* GRADIENT TEXT */
+        .gradient-text {
+            background: linear-gradient(90deg, #ffffff, #aaaaaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .badge.green { background: #dafbe1; color: #1a7f37; }
 
-        /* =========================================
-           2. MOBILE RESPONSIVENESS
-           ========================================= */
-        @media (max-width: 768px) {
-            .grid-2 { grid-template-columns: 1fr !important; }
-            h1 { font-size: 2rem !important; }
-            .hero-stats { flex-direction: column; gap: 10px; }
-        }
+        /* GRID SYSTEM */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
     </style>
 </head>
 <body>
 
-    <header style="background: linear-gradient(135deg, var(--dark) 0%, #1a1e22 100%); color: white; padding: 80px 0;">
-        <div class="container" style="text-align: center;">
-            
-            <div style="width: 100px; height: 100px; background: #e1e4e8; border-radius: 50%; margin: 0 auto 20px auto; overflow: hidden; border: 3px solid var(--primary);">
-                <img src="https://github.com/ananth9911.png" alt="Ananth" style="width: 100%; height: 100%;">
-            </div>
-
-            <h1 style="font-size: 3rem; margin-bottom: 10px;">Ananth</h1>
-            <p style="font-size: 1.25rem; color: #d1d5da; margin-bottom: 20px;">
-                Software Engineer @ <strong>Tredence</strong> | 4★ CodeChef (Max 1940)
-            </p>
-
-            <div class="hero-stats" style="display: flex; justify-content: center; gap: 30px; margin-bottom: 30px; color: #959da5; font-size: 0.9rem;">
-                <span>📍 Bengaluru, India</span>
-                <span>🎓 SRM University</span>
-                <span>🚀 Focusing on Scalability & DSA</span>
-            </div>
-
-            <div>
-                <a href="./resume.pdf" target="_blank" style="background: var(--primary); color: white; padding: 12px 30px; border-radius: 50px; font-weight: 600; display: inline-block; margin-right: 10px;">
-                    Download Resume
-                </a>
-                <a href="https://github.com/ananth9911" target="_blank" style="background: rgba(255,255,255,0.1); color: white; padding: 12px 30px; border-radius: 50px; font-weight: 600; display: inline-block; border: 1px solid rgba(255,255,255,0.2);">
-                    GitHub Profile
-                </a>
+    <header style="padding: 100px 0 60px 0;">
+        <div class="container">
+            <div class="animate-in">
+                <p style="color: var(--primary); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 15px;">
+                    // Hello World, I'm
+                </p>
+                <h1 style="font-size: 4rem; line-height: 1.1; margin-bottom: 20px;" class="gradient-text">
+                    Ananth.
+                </h1>
+                <h2 style="font-size: 1.8rem; color: var(--text-muted); font-weight: 400; margin-bottom: 30px;">
+                    Software Engineer. <span style="color: #fff;">Problem Solver.</span> Builder.
+                </h2>
+                <div style="display: flex; gap: 15px;">
+                    <a href="./resume.pdf" target="_blank" style="background: var(--text-main); color: #000; padding: 12px 30px; border-radius: 50px; font-weight: 700;">
+                        Download Resume
+                    </a>
+                    <a href="https://github.com/ananth9911" target="_blank" style="border: 1px solid var(--border); color: #fff; padding: 12px 30px; border-radius: 50px; font-weight: 600; background: rgba(255,255,255,0.05);">
+                        GitHub
+                    </a>
+                </div>
             </div>
         </div>
     </header>
 
-    <section id="dashboard" style="background-color: var(--light-bg); padding: 60px 0;">
-        <div class="container">
+    <section class="container animate-in delay-1" style="margin-bottom: 80px;">
+        
+        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <p style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 700;">Engineering Velocity</p>
+            <p style="font-size: 0.9rem; color: var(--primary);">● System Active</p>
+        </div>
+
+        <div class="glass-card" style="padding: 0; overflow: hidden;">
             
-            <div style="text-align: center; margin-bottom: 40px;">
-                <h2 style="font-size: 2rem; color: var(--dark);">🚀 The 700 Path: Mission Control</h2>
-                <p style="color: var(--text-muted);">Live tracking of my journey to mastering Data Structures & Algorithms.</p>
-                
-                <div style="background: #e1e4e8; height: 20px; border-radius: 10px; max-width: 600px; margin: 20px auto; overflow: hidden;">
-                    <div style="width: 15%; background: var(--primary); height: 100%; border-radius: 10px; font-size: 0.75rem; color: white; text-align: right; padding-right: 8px; line-height: 20px; font-weight: bold;">
-                        15%
-                    </div>
+            <div style="padding: 30px; display: flex; flex-wrap: wrap; gap: 40px; border-bottom: 1px solid var(--border);">
+                <div style="flex: 1; min-width: 300px;">
+                    <img src="https://github-readme-stats.vercel.app/api?username=ananth9911&show_icons=true&theme=dark&bg_color=00000000&hide_border=true&title_color=00f260&icon_color=0575E6&text_color=ffffff" 
+                         alt="GitHub Stats" style="width: 100%;">
+                </div>
+                <div style="flex: 1; min-width: 250px; display: flex; align-items: center; justify-content: center;">
+                    <img src="https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/topic_breakdown.png" 
+                         alt="Topic Breakdown" style="width: 100%; max-width: 300px; border-radius: 10px; opacity: 0.9;">
                 </div>
             </div>
 
-            <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 30px;">
-                
-                <div class="card" style="text-align: center;">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">📊 Engineering Velocity</h3>
-                    <img src="https://github-readme-stats.vercel.app/api?username=ananth9911&show_icons=true&theme=default&count_private=true&hide_border=true" 
-                         alt="GitHub Stats" style="width: 100%; max-width: 400px;">
-                    <br>
-                    <img src="https://github-readme-streak-stats.herokuapp.com/?user=ananth9911&theme=default&hide_border=true&date_format=M%20j%5B%2C%20Y%5D" 
-                         alt="GitHub Streak" style="width: 100%; max-width: 400px; margin-top: 10px;">
-                </div>
-
-                <div class="card" style="text-align: center;">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">🎯 Technical Focus Areas</h3>
-                    
-                    <div style="background: #fafbfc; border-radius: 8px; padding: 10px; display: inline-block;">
-                        <img src="https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/topic_breakdown.png" 
-                             alt="Topic Breakdown" style="width: 100%; max-width: 320px; border-radius: 5px;">
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <a href="https://github.com/ananth9911/daily-coding-log" target="_blank" style="font-size: 0.9rem; color: var(--primary); font-weight: 600;">
-                            View Detailed Problem Log &rarr;
-                        </a>
-                    </div>
-                </div>
+            <div style="padding: 30px; background: rgba(0,0,0,0.2);">
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">
+                    Daily DSA Problem Solving Activity
+                </p>
+                <img src="https://ghchart.rshah.org/00f260/ananth9911" alt="DSA Heatmap" style="width: 100%; opacity: 0.8;">
             </div>
 
-            <div class="card" style="padding: 20px; overflow-x: auto;">
-                <h3 style="font-size: 1.1rem; margin-bottom: 10px;">🔥 Consistency Graph</h3>
-                <img src="https://ghchart.rshah.org/2ea44f/ananth9911" alt="Contributions" style="min-width: 600px; width: 100%;">
+            <div style="height: 4px; background: #222; width: 100%;">
+                <div style="height: 100%; width: 15%; background: var(--primary); box-shadow: 0 0 10px var(--primary);"></div>
             </div>
-
         </div>
     </section>
 
-    <section id="experience" style="padding: 60px 0;">
-        <div class="container">
-            <h2 style="font-size: 2rem; margin-bottom: 40px; text-align: center;">Professional Journey</h2>
+    <section class="container animate-in delay-2" style="margin-bottom: 80px;">
+        <div class="grid-2">
+            
+            <div>
+                <h3 style="margin-bottom: 30px;">Experience</h3>
 
-            <div class="card" style="margin-bottom: 24px; border-left: 5px solid var(--primary);">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
-                    <div>
-                        <h3 style="font-size: 1.3rem;">Software Engineer I</h3>
-                        <p style="color: var(--primary); font-weight: 600; margin: 0;">Tredence Inc.</p>
+                <div class="glass-card" style="margin-bottom: 20px; border-left: 3px solid var(--primary);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 1.1rem;">Software Engineer I</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Aug 2024 - Present</span>
                     </div>
-                    <span style="background: var(--dark); color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem;">Aug 2024 - Present</span>
+                    <p style="font-size: 0.9rem; color: var(--accent); margin-bottom: 15px;">Leading Analytics Firm</p>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; color: #ccc; margin: 0;">
+                        <li style="margin-bottom: 8px;">Analyzed large-scale customer data to drive actionable marketing insights for a Global Retail Giant.</li>
+                        <li>Executed complex data engineering tasks to support high-priority analytics initiatives.</li>
+                    </ul>
                 </div>
-                <ul style="color: var(--text-muted); margin-top: 15px;">
-                    <li>Analyzing large-scale customer data to drive actionable marketing insights for Walmart.</li>
-                    <li>Executing complex data engineering tasks to support high-priority analytics initiatives.</li>
-                </ul>
+
+                <div class="glass-card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 1.1rem;">Analyst</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Aug 2022 - Jan 2023</span>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Leading Analytics Firm</p>
+                    <ul style="padding-left: 20px; font-size: 0.9rem; color: #ccc; margin: 0;">
+                        <li>Supported customer analytics pipelines and data visualization tasks.</li>
+                        <li>Collaborated with cross-functional teams to optimize data flow.</li>
+                    </ul>
+                </div>
+
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 1.1rem;">ML Intern</span>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">May 2020 - Jun 2020</span>
+                    </div>
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">Uptricks</p>
+                    <p style="font-size: 0.9rem; color: #ccc;">Iterated on churn prediction algorithms for regional banking data.</p>
+                </div>
             </div>
 
-            <div class="card" style="margin-bottom: 24px; border-left: 5px solid #959da5;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+            <div>
+                <h3 style="margin-bottom: 30px;">Tech Stack & Projects</h3>
+
+                <div class="glass-card" style="margin-bottom: 25px;">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; text-transform: uppercase;">Core Competencies</p>
                     <div>
-                        <h3 style="font-size: 1.3rem;">Analyst</h3>
-                        <p style="color: var(--text-muted); font-weight: 600; margin: 0;">Tredence Inc.</p>
+                        <span class="tech-pill">C++</span>
+                        <span class="tech-pill">Python</span>
+                        <span class="tech-pill">Java (DSA)</span>
+                        <span class="tech-pill">SQL</span>
+                        <span class="tech-pill">DBMS</span>
+                        <span class="tech-pill">JavaScript</span>
+                        <span class="tech-pill">PHP</span>
+                        <span class="tech-pill">System Design</span>
                     </div>
-                    <span style="background: #f1f1f1; color: #666; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem;">Aug 2022 - Jan 2023</span>
-                </div>
-                <ul style="color: var(--text-muted); margin-top: 15px;">
-                    <li>Supported customer analytics pipelines and data visualization tasks for retail clients.</li>
-                    <li>Collaborated with cross-functional teams to optimize data flow and reporting accuracy.</li>
-                </ul>
-            </div>
-
-            <div class="card" style="border-left: 5px solid #959da5;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
-                    <div>
-                        <h3 style="font-size: 1.3rem;">Machine Learning Intern</h3>
-                        <p style="color: var(--text-muted); font-weight: 600; margin: 0;">Uptricks</p>
-                    </div>
-                    <span style="background: #f1f1f1; color: #666; padding: 4px 12px; border-radius: 4px; font-size: 0.8rem;">May 2020 - Jun 2020</span>
-                </div>
-                <ul style="color: var(--text-muted); margin-top: 15px;">
-                    <li>Analyzed churn data for a regional bank and iterated on ML algorithms to improve prediction accuracy.</li>
-                </ul>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="projects" style="padding: 60px 0; background-color: var(--light-bg);">
-        <div class="container">
-            <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-                
-                <div>
-                    <h2 style="margin-bottom: 20px;">Featured Projects</h2>
                     
-                    <div class="card" style="margin-bottom: 20px;">
-                        <h3>Inventory Management System</h3>
-                        <p style="font-size: 0.9rem; color: var(--text-muted);">
-                            A full-stack operational tool for retail. Features automated GST calculation, discount logic, and live inventory tracking used by local supermarkets.
-                        </p>
-                        <div style="margin-top: 10px;">
-                            <span class="badge green">PHP</span>
-                            <span class="badge green">SQL</span>
-                            <span class="badge green">Full Stack</span>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3>Secret Diary (Encrypted)</h3>
-                        <p style="font-size: 0.9rem; color: var(--text-muted);">
-                            Secure note-taking web app. Implemented custom login systems and MD5 hashing for rigorous data protection.
-                        </p>
-                        <div style="margin-top: 10px;">
-                            <span class="badge green">Security</span>
-                            <span class="badge green">MD5 Hashing</span>
+                    <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 20px;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; text-transform: uppercase;">Competitive Coding</p>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.5rem; font-weight: 700; color: #fff;">4★</span>
+                            <div>
+                                <div style="font-size: 0.9rem;">CodeChef</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">Max Rating: 1940</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <h2 style="margin-bottom: 20px;">Technical Arsenal</h2>
-                    
-                    <div class="card" style="margin-bottom: 20px;">
-                        <h4 style="margin-bottom: 10px;">Languages & Core</h4>
-                        <div>
-                            <span class="badge">C++</span>
-                            <span class="badge">Python</span>
-                            <span class="badge
+                <div class="glass-card" style="margin-bottom: 25px;">
+                    <h4 style="margin-bottom: 10px;">Inventory Management System</h4>
+                    <p style="font-size: 0.9rem; color: #bbb; margin-bottom: 15px;">
+                        Full-stack tool for supermarkets featuring automated GST calculation, discount logic, and live stock tracking.
+                    </p>
+                    <div>
+                        <span class="tech-pill" style="font-size: 0.75rem;">PHP</span>
+                        <span class="tech-pill" style="font-size: 0.75rem;">SQL</span>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h4 style="margin-bottom: 10px;">Encrypted Secret Diary</h4>
+                    <p style="font-size: 0.9rem; color: #bbb; margin-bottom: 15px;">
+                        Secure web app with custom login and MD5 hashing encryption for user data protection.
+                    </p>
+                    <div>
+                        <span class="tech-pill" style="font-size: 0.75rem;">Security</span>
+                        <span class="tech-pill" style="font-size: 0.75rem;">MD5</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>

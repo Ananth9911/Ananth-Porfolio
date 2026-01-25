@@ -17,7 +17,7 @@
             --border: rgba(255, 255, 255, 0.1);
             --text-main: #ffffff;
             --text-muted: #888888;
-            --primary: #4ADE80; /* Neon Green */
+            --primary: #4ADE80; 
             --spotlight-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* GRID BACKGROUND (Subtle Tech Vibe) */
+        /* GRID BACKGROUND */
         body::before {
             content: "";
             position: fixed;
@@ -54,7 +54,7 @@
         }
 
         /* =========================================
-           HERO SECTION (Blur Reveal)
+           HERO SECTION
            ========================================= */
         .hero {
             height: 85vh;
@@ -73,7 +73,6 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
             
-            /* ANIMATION */
             filter: blur(20px);
             opacity: 0;
             animation: textFocus 1.5s cubic-bezier(0.2, 0, 0, 1) forwards;
@@ -119,7 +118,7 @@
             transform: translateY(-2px);
         }
 
-        /* The Moving Spotlight Glow */
+        /* Moving Spotlight Glow */
         .spotlight-card::before {
             content: "";
             position: absolute;
@@ -131,12 +130,12 @@
                 transparent 40%
             );
             z-index: 1;
-            opacity: 0; /* Hidden until mouse enters */
+            opacity: 0;
             transition: opacity 0.5s;
             pointer-events: none;
         }
         
-        /* The Moving Border Glow */
+        /* Moving Border Glow */
         .spotlight-card::after {
             content: "";
             position: absolute;
@@ -147,14 +146,14 @@
                 rgba(255, 255, 255, 0.3),
                 transparent 40%
             );
-            z-index: 0; /* Behind content, on border */
+            z-index: 0;
             opacity: 0;
             transition: opacity 0.5s;
             pointer-events: none;
             mask-image: linear-gradient(black, black), linear-gradient(black, black);
             mask-clip: content-box, border-box;
-            mask-composite: exclude; /* Shows only border */
-            padding: 1px; /* Border width */
+            mask-composite: exclude;
+            padding: 1px;
             border-radius: inherit;
         }
 
@@ -163,9 +162,27 @@
             opacity: 1;
         }
 
-        .card-content {
-            position: relative;
-            z-index: 2; /* Keeps text above glow */
+        .card-content { position: relative; z-index: 2; }
+
+        /* =========================================
+           HEATMAP FIX (HIGH VISIBILITY)
+           ========================================= */
+        .heatmap-container {
+            margin-top: 40px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            padding-top: 25px;
+            
+            /* The Contrast Fix: Subtle background behind the graph */
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .heatmap-img {
+            width: 100%; 
+            /* Full Visibility */
+            opacity: 1; 
+            filter: brightness(1.2); /* Boost brightness */
         }
 
         /* =========================================
@@ -187,10 +204,7 @@
             margin: 0 5px 5px 0;
             transition: 0.3s;
         }
-        .spotlight-card:hover .tag {
-            border-color: #555;
-            color: #fff;
-        }
+        .spotlight-card:hover .tag { border-color: #555; color: #fff; }
 
         .btn {
             padding: 12px 24px;
@@ -199,22 +213,11 @@
             transition: 0.2s;
             font-size: 0.9rem;
         }
-        .btn-primary {
-            background: #fff;
-            color: #000;
-        }
-        .btn-primary:hover {
-            box-shadow: 0 0 20px rgba(255,255,255,0.4);
-        }
-        .btn-ghost {
-            border: 1px solid #333;
-            color: #fff;
-        }
-        .btn-ghost:hover {
-            border-color: #fff;
-        }
+        .btn-primary { background: #fff; color: #000; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+        .btn-ghost { border: 1px solid #333; color: #fff; }
+        .btn-ghost:hover { border-color: #fff; }
 
-        /* Status Dot Pulse */
         .status-dot {
             height: 8px; width: 8px;
             background-color: var(--primary);
@@ -225,9 +228,6 @@
             animation: pulse 2s infinite;
         }
 
-        /* =========================================
-           ANIMATIONS
-           ========================================= */
         @keyframes textFocus {
             0% { filter: blur(20px); opacity: 0; }
             100% { filter: blur(0px); opacity: 1; }
@@ -242,7 +242,6 @@
             100% { opacity: 1; }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
             .hero h1 { font-size: 15vw; }
             .card-grid { grid-template-columns: 1fr; }
@@ -292,10 +291,10 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <div class="heatmap-container">
                     <p style="font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px;">Daily Activity Log</p>
-                    <img src="https://ghchart.rshah.org/4ADE80/ananth9911" 
-                         style="width: 100%; opacity: 0.8;" alt="Heatmap">
+                    <img src="https://ghchart.rshah.org/00f260/ananth9911" 
+                         class="heatmap-img" alt="Heatmap">
                 </div>
             </div>
         </div>
@@ -384,16 +383,12 @@
     </footer>
 
     <script>
-        // Use 'mousemove' to track cursor position on cards
         const cards = document.querySelectorAll(".spotlight-card");
-        
         document.body.onmousemove = e => {
             for(const card of cards) {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-
-                // Set CSS Variables for the gradient position
                 card.style.setProperty("--mouse-x", `${x}px`);
                 card.style.setProperty("--mouse-y", `${y}px`);
             }

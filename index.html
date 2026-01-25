@@ -216,8 +216,8 @@
             <div class="card-content">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
                     <div>
-                        <h3>Engineering Output</h3>
-                        <p style="font-size: 0.9rem; margin-top: 5px;">Live Telemetry from GitHub</p>
+                        <h3>Algorithmic Velocity</h3>
+                        <p style="font-size: 0.9rem; margin-top: 5px;">Live DSA Telemetry from GitHub</p>
                         <p id="last-active" style="font-size: 0.8rem; color: var(--primary); margin-top: 5px; opacity: 0;">
                             Latest: Fetching...
                         </p>
@@ -494,11 +494,14 @@
                     
                     cell.className = `day-cell ${level}`;
 
-                    // Telemetry Hover
+                    // Telemetry Hover// FIND THIS INSIDE renderHeatmap AND REPLACE
                     cell.onmouseenter = () => {
-                        statusDisplay.innerHTML = `<span style="color:#39d353">${day.count} Problems</span> on ${day.displayDate}`;
-                        statusDisplay.style.color = "#fff";
+                    // OLD: ... ${day.count} Problems on ...
+                    // NEW: ... ${day.count} Problems Solved on ...
+                    statusDisplay.innerHTML = `<span style="color:#39d353">${day.count} Problems Solved</span> on ${day.displayDate}`;
+                    statusDisplay.style.color = "#fff";
                     };
+                    
                     
                     // Reset on leave (Optional)
                     cell.onmouseleave = () => {

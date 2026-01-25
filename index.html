@@ -5,312 +5,399 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ananth | Engineer</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         /* =========================================
            CORE VARIABLES
            ========================================= */
         :root {
-            --bg: #000000;
-            --surface: #111111;
-            --border: #333333;
+            --bg: #030303;
+            --card-bg: #0a0a0a;
+            --border: rgba(255, 255, 255, 0.1);
             --text-main: #ffffff;
-            --text-muted: #aaaaaa;
-            --accent: #2ea44f;
-            --spotlight: rgba(255, 255, 255, 0.05);
+            --text-muted: #888888;
+            --primary: #4ADE80; /* Neon Green */
+            --spotlight-color: rgba(255, 255, 255, 0.1);
         }
-
-        /* RESET */
-        * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             overflow-x: hidden;
         }
 
-        /* TYPOGRAPHY */
-        h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -1px; }
+        /* GRID BACKGROUND (Subtle Tech Vibe) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 100%);
+        }
+
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; margin: 0; }
         p { line-height: 1.6; color: var(--text-muted); }
         a { text-decoration: none; color: inherit; }
-        
-        /* CONTAINER */
+
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 0 24px;
         }
 
         /* =========================================
-           HERO SECTION (No Animation - Solid Text)
+           HERO SECTION (Blur Reveal)
            ========================================= */
-        .hero-section {
-            padding: 120px 0 80px 0;
+        .hero {
+            height: 85vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-
-        .hero-sub {
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .hero-text {
-            /* SOLID WHITE COLOR - NO GRADIENT RISKS */
-            color: #ffffff; 
-            font-size: 5rem;
-            line-height: 1;
-            margin-bottom: 20px;
-        }
-
-        /* Responsive Text Size */
-        @media (max-width: 768px) {
-            .hero-text { font-size: 3.5rem; }
-        }
-
-        .hero-desc {
-            font-size: 1.3rem;
-            color: var(--text-muted);
-            max-width: 600px;
-        }
-
-        .btn-group { 
-            margin-top: 40px; 
-            display: flex; 
-            gap: 15px; 
-        }
-
-        /* =========================================
-           CARDS (Simple & Stable)
-           ========================================= */
-        .interactive-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 24px;
-            transition: transform 0.2s, border-color 0.2s;
             position: relative;
         }
 
-        .interactive-card:hover {
-            border-color: #555;
-            transform: translateY(-3px);
+        .hero h1 {
+            font-size: 12vw;
+            line-height: 0.9;
+            font-weight: 700;
+            background: linear-gradient(to bottom, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            
+            /* ANIMATION */
+            filter: blur(20px);
+            opacity: 0;
+            animation: textFocus 1.5s cubic-bezier(0.2, 0, 0, 1) forwards;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            max-width: 600px;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.5s forwards;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.8s forwards;
         }
 
         /* =========================================
-           DASHBOARD METRICS
+           SPOTLIGHT CARD ENGINE
            ========================================= */
-        .section-title {
-            font-size: 2.5rem;
-            margin: 80px 0 40px 0;
-            color: #fff;
-            border-bottom: 1px solid #222;
-            padding-bottom: 20px;
-        }
-        .section-title span { color: var(--accent); }
-
-        .metric-row {
-            display: flex;
-            flex-wrap: wrap;
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            background: rgba(46, 164, 79, 0.15);
-            color: #2ea44f;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 700;
+        .spotlight-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+            cursor: default;
+        }
+
+        .spotlight-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* The Moving Spotlight Glow */
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            height: 100%; width: 100%;
+            top: 0; left: 0;
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 255, 255, 0.06),
+                transparent 40%
+            );
+            z-index: 1;
+            opacity: 0; /* Hidden until mouse enters */
+            transition: opacity 0.5s;
+            pointer-events: none;
         }
         
-        .pulse {
-            width: 8px; height: 8px;
-            background: #2ea44f;
-            border-radius: 50%;
+        /* The Moving Border Glow */
+        .spotlight-card::after {
+            content: "";
+            position: absolute;
+            height: 100%; width: 100%;
+            top: 0; left: 0;
+            background: radial-gradient(
+                400px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 255, 255, 0.3),
+                transparent 40%
+            );
+            z-index: 0; /* Behind content, on border */
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            mask-image: linear-gradient(black, black), linear-gradient(black, black);
+            mask-clip: content-box, border-box;
+            mask-composite: exclude; /* Shows only border */
+            padding: 1px; /* Border width */
+            border-radius: inherit;
         }
 
-        /* BUTTONS */
-        .btn {
-            padding: 12px 30px;
-            border-radius: 100px;
-            font-weight: 600;
-            font-size: 1rem;
-            border: 1px solid transparent;
+        .spotlight-card:hover::before,
+        .spotlight-card:hover::after {
+            opacity: 1;
         }
-        .btn-primary { background: #fff; color: #000; }
-        .btn-primary:hover { background: #ddd; }
-        .btn-ghost { border-color: #444; color: #fff; }
-        .btn-ghost:hover { border-color: #fff; }
 
-        /* TAGS */
-        .skill-tag {
+        .card-content {
+            position: relative;
+            z-index: 2; /* Keeps text above glow */
+        }
+
+        /* =========================================
+           UI COMPONENTS
+           ========================================= */
+        .section-header {
+            margin: 100px 0 50px 0;
+            font-size: 2.5rem;
+            color: #fff;
+        }
+
+        .tag {
+            display: inline-block;
             border: 1px solid #333;
             color: #ccc;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.85rem;
-            display: inline-block;
-            margin: 0 4px 8px 0;
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            margin: 0 5px 5px 0;
+            transition: 0.3s;
+        }
+        .spotlight-card:hover .tag {
+            border-color: #555;
+            color: #fff;
         }
 
-        /* GRID */
-        .card-grid { display: grid; gap: 24px; }
-        @media (min-width: 768px) {
-            .card-grid-2 { grid-template-columns: 1fr 1fr; }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.2s;
+            font-size: 0.9rem;
         }
-
-        /* PROGRESS BAR */
-        .progress-bg {
-            width: 100%;
-            height: 4px;
-            background: #222;
-            margin-top: 30px;
-            border-radius: 2px;
-        }
-        .progress-fill {
-            height: 100%;
+        .btn-primary {
             background: #fff;
-            width: 15%; /* Static width so it's always visible */
+            color: #000;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 20px rgba(255,255,255,0.4);
+        }
+        .btn-ghost {
+            border: 1px solid #333;
+            color: #fff;
+        }
+        .btn-ghost:hover {
+            border-color: #fff;
+        }
+
+        /* Status Dot Pulse */
+        .status-dot {
+            height: 8px; width: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary);
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        /* =========================================
+           ANIMATIONS
+           ========================================= */
+        @keyframes textFocus {
+            0% { filter: blur(20px); opacity: 0; }
+            100% { filter: blur(0px); opacity: 1; }
+        }
+        @keyframes fadeUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 15vw; }
+            .card-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <section class="hero-section container">
-        <div class="hero-sub">Software Engineer</div>
-        <h1 class="hero-text">ANANTH</h1>
-        <p class="hero-desc">
-            Building scalable systems and analyzing data at high velocity.
+    <section class="container hero">
+        <p style="color: var(--primary); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 20px;">
+            <span class="status-dot"></span> System Online
         </p>
-
-        <div class="btn-group">
-            <a href="./resume.pdf" target="_blank" class="btn btn-primary">Resume</a>
+        <h1>ANANTH</h1>
+        <p>
+            Building scalable systems and analyzing data at high velocity. 
+            Obsessed with performance and clean architecture.
+        </p>
+        <div class="hero-badges">
+            <a href="./resume.pdf" target="_blank" class="btn btn-primary">Download Resume</a>
             <a href="https://github.com/ananth9911" target="_blank" class="btn btn-ghost">GitHub</a>
         </div>
     </section>
 
     <section class="container">
-        <h2 class="section-title">System <span>Velocity</span></h2>
+        <h2 class="section-header">Velocity</h2>
         
-        <div class="interactive-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <div>
-                    <h3 style="font-size: 1.5rem;">Engineering Output</h3>
-                    <p style="margin-top: 5px; font-size: 0.9rem;">Live Telemetry</p>
+        <div class="spotlight-card">
+            <div class="card-content">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+                    <div>
+                        <h3>Engineering Output</h3>
+                        <p style="font-size: 0.9rem; margin-top: 5px;">Live Telemetry from GitHub</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 2rem; font-weight: 700; color: #fff;">Active</span>
+                    </div>
                 </div>
-                <div class="status-badge">
-                    <div class="pulse"></div>
-                    Online
-                </div>
-            </div>
 
-            <div class="metric-row">
-                <div style="flex: 1; min-width: 280px;">
-                    <img src="https://github-readme-stats.vercel.app/api?username=ananth9911&show_icons=true&theme=dark&bg_color=00000000&hide_border=true&title_color=ffffff&text_color=cccccc&icon_color=2ea44f" 
-                         style="width: 100%;" alt="Stats">
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 300px;">
+                        <img src="https://github-readme-stats.vercel.app/api?username=ananth9911&show_icons=true&theme=dark&bg_color=00000000&hide_border=true&title_color=ffffff&text_color=aaaaaa&icon_color=4ADE80" 
+                             style="width: 100%;" alt="Stats">
+                    </div>
+                    <div style="flex: 1; min-width: 200px; display: flex; align-items: center; justify-content: center;">
+                        <img src="https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/topic_breakdown.png" 
+                             style="width: 100%; max-width: 220px; border-radius: 12px; opacity: 0.9;" alt="Focus Areas">
+                    </div>
                 </div>
-                <div style="flex: 1; min-width: 200px; text-align: center;">
-                    <img src="https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/topic_breakdown.png" 
-                         style="width: 100%; max-width: 220px; border-radius: 12px; opacity: 0.9;" alt="Focus Areas">
+
+                <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    <p style="font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px;">Daily Activity Log</p>
+                    <img src="https://ghchart.rshah.org/4ADE80/ananth9911" 
+                         style="width: 100%; opacity: 0.8;" alt="Heatmap">
                 </div>
-            </div>
-
-            <div style="margin-top: 40px;">
-                <p style="font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; color: #666;">Daily Activity Log</p>
-                <img src="https://ghchart.rshah.org/2ea44f/ananth9911" 
-                     style="width: 100%; opacity: 0.9;" alt="Heatmap">
-            </div>
-
-            <div class="progress-bg">
-                <div class="progress-fill"></div>
             </div>
         </div>
     </section>
 
     <section class="container">
-        <h2 class="section-title">Career <span>History</span></h2>
+        <h2 class="section-header">History</h2>
         
         <div class="card-grid">
-            <div class="interactive-card">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
-                    <h3 style="font-size: 1.3rem;">Software Engineer I</h3>
-                    <span style="color: var(--text-muted); font-size: 0.9rem;">2024 — Present</span>
+            <div class="spotlight-card">
+                <div class="card-content">
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 1.5rem; color: #fff;">Software Engineer I</h3>
+                        <span style="color: var(--primary); font-size: 0.9rem;">2024 — Present</span>
+                    </div>
+                    <p>
+                        Architecting data pipelines and deriving marketing insights for global retail giants. 
+                        Optimizing high-velocity data flow for critical business decisions.
+                    </p>
                 </div>
-                <p>
-                    Architecting data pipelines and deriving marketing insights for global retail giants. 
-                    Optimizing high-velocity data flow for critical business decisions.
-                </p>
             </div>
 
-            <div class="interactive-card">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
-                    <h3 style="font-size: 1.3rem;">Analyst</h3>
-                    <span style="color: var(--text-muted); font-size: 0.9rem;">2022 — 2023</span>
+            <div class="spotlight-card">
+                <div class="card-content">
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="font-size: 1.5rem; color: #fff;">Analyst</h3>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">2022 — 2023</span>
+                    </div>
+                    <p style="color: #fff; margin-bottom: 10px; font-weight: 600;">Tredence Inc.</p>
+                    <p>
+                        Executed data engineering tasks and supported customer analytics initiatives. 
+                        Built visualization layers for stakeholder reporting.
+                    </p>
                 </div>
-                <p style="color: #fff; margin-bottom: 10px; font-weight: 700;">Tredence Inc.</p>
-                <p>
-                    Executed data engineering tasks and supported customer analytics initiatives. 
-                    Built visualization layers for stakeholder reporting.
-                </p>
             </div>
         </div>
     </section>
 
     <section class="container" style="padding-bottom: 100px;">
-        <h2 class="section-title">Technical <span>Builds</span></h2>
+        <h2 class="section-header">Builds</h2>
         
-        <div class="card-grid card-grid-2">
-            
-            <div class="interactive-card">
-                <h3 style="margin-bottom: 20px;">Arsenal</h3>
-                <div style="margin-bottom: 30px;">
-                    <span class="skill-tag">C++</span>
-                    <span class="skill-tag">Python</span>
-                    <span class="skill-tag">Java</span>
-                    <span class="skill-tag">SQL</span>
-                </div>
-                <h3 style="margin-bottom: 20px;">Competitive</h3>
-                <div>
-                    <span class="skill-tag" style="background: #fff; color: #000; border-color: #fff; font-weight: 700;">CodeChef 4★ (1940)</span>
-                    <span class="skill-tag">Global Rank 129</span>
-                </div>
-            </div>
-
-            <div class="interactive-card">
-                <h3 style="margin-bottom: 20px;">Projects</h3>
-                
-                <div style="margin-bottom: 30px;">
-                    <h4 style="font-size: 1.1rem; margin-bottom: 5px; color: #fff;">Inventory System</h4>
-                    <p style="font-size: 0.9rem;">Full-stack retail operations tool with automated GST.</p>
-                </div>
-
-                <div>
-                    <h4 style="font-size: 1.1rem; margin-bottom: 5px; color: #fff;">Encrypted Diary</h4>
-                    <p style="font-size: 0.9rem;">Secure note storage with custom MD5 hashing.</p>
+        <div class="card-grid">
+            <div class="spotlight-card">
+                <div class="card-content">
+                    <h3 style="margin-bottom: 20px; color: #fff;">Arsenal</h3>
+                    <div style="margin-bottom: 30px;">
+                        <span class="tag">C++</span>
+                        <span class="tag">Python</span>
+                        <span class="tag">Java</span>
+                        <span class="tag">SQL</span>
+                        <span class="tag">System Design</span>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 20px; color: #fff;">Competitive</h3>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 2rem; font-weight: 700; color: #fff;">4★</span>
+                            <span style="color: var(--text-muted);">CodeChef</span>
+                        </div>
+                        <span class="tag">Max Rating: 1940</span>
+                        <span class="tag">Rank 129 Global</span>
+                    </div>
                 </div>
             </div>
 
+            <div class="spotlight-card">
+                <div class="card-content">
+                    <h3 style="margin-bottom: 20px; color: #fff;">Projects</h3>
+                    
+                    <div style="margin-bottom: 30px;">
+                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 5px;">Inventory System</h4>
+                        <p style="font-size: 0.9rem;">Full-stack retail operations tool with automated GST and live tracking.</p>
+                    </div>
+
+                    <div>
+                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 5px;">Encrypted Diary</h4>
+                        <p style="font-size: 0.9rem;">Secure note storage with custom MD5 hashing and authentication.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <footer style="text-align: center; padding: 60px 0; color: #444; font-size: 0.9rem;">
-        &copy; 2026 Ananth. Designed for Performance.
+    <footer style="text-align: center; padding: 60px 0; color: #333; font-size: 0.9rem;">
+        &copy; 2026 Ananth. Performance First.
     </footer>
 
+    <script>
+        // Use 'mousemove' to track cursor position on cards
+        const cards = document.querySelectorAll(".spotlight-card");
+        
+        document.body.onmousemove = e => {
+            for(const card of cards) {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Set CSS Variables for the gradient position
+                card.style.setProperty("--mouse-x", `${x}px`);
+                card.style.setProperty("--mouse-y", `${y}px`);
+            }
+        }
+    </script>
 </body>
 </html>

@@ -16,7 +16,7 @@
     
     <style>
         /* =========================================
-           CORE VARIABLES & RESET
+           CORE VARIABLES
            ========================================= */
         :root {
             --bg: #030303;
@@ -83,7 +83,6 @@
             background-color: var(--card-bg); border: 1px solid var(--border);
             border-radius: 16px; padding: 40px; position: relative; overflow: hidden;
             transition: transform 0.2s;
-            /* Spotlight vars */
             --mouse-x: 0px; --mouse-y: 0px;
         }
         .spotlight-card:hover { transform: translateY(-2px); }
@@ -110,13 +109,21 @@
         }
         .chip:hover, .chip.active { background: #fff; color: #000; border-color: #fff; }
 
-        /* LIVE STATS BAR */
+        /* TOPIC DROPDOWN */
+        .topic-select {
+            background: #0a0a0a; border: 1px solid #333; color: #ccc;
+            padding: 6px 14px; border-radius: 8px; font-family: 'Inter'; font-size: 0.8rem;
+            outline: none; cursor: pointer; transition: 0.2s; margin-left: 10px;
+        }
+        .topic-select:hover { border-color: #666; color: #fff; }
+
+        /* STATS BAR */
         .stat-bar { height: 8px; width: 100%; background: #222; border-radius: 4px; overflow: hidden; display: flex; margin-top: 15px; }
         .stat-segment { height: 100%; transition: width 1s ease; }
         .stat-legend { display: flex; gap: 20px; font-size: 0.8rem; margin-top: 10px; color: #888; }
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 
-        /* STATIC TAGS (Replaced Marquee) */
+        /* STATIC TAGS */
         .tag-container { display: flex; flex-wrap: wrap; gap: 10px; }
         .tag { border: 1px solid #333; color: #ccc; padding: 8px 16px; border-radius: 50px; font-size: 0.9rem; transition: 0.3s; }
         .spotlight-card:hover .tag { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
@@ -206,13 +213,15 @@
                    style="background: #0a0a0a; border: 1px solid #333; color: #fff; padding: 10px 20px; border-radius: 50px; outline: none; width: 200px; font-size: 0.9rem;">
         </div>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
-            <div class="chip active" onclick="filterByChip('all', this)">All</div>
-            <div class="chip" onclick="filterByChip('easy', this)">Easy</div>
-            <div class="chip" onclick="filterByChip('medium', this)">Medium</div>
-            <div class="chip" onclick="filterByChip('hard', this)">Hard</div>
-            <div class="chip" onclick="filterByChip('dp', this)">DP</div>
-            <div class="chip" onclick="filterByChip('graph', this)">Graph</div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <div class="chip active" onclick="filterByDiff('all', this)">All</div>
+            <div class="chip" onclick="filterByDiff('easy', this)">Easy</div>
+            <div class="chip" onclick="filterByDiff('medium', this)">Medium</div>
+            <div class="chip" onclick="filterByDiff('hard', this)">Hard</div>
+            
+            <select id="topicSelect" class="topic-select" onchange="filterByTopic(this.value)">
+                <option value="all">All Topics</option>
+                </select>
         </div>
         
         <div class="spotlight-card" style="padding: 0;">
@@ -245,7 +254,7 @@
                         <span style="color: var(--primary); font-size: 0.9rem;">2024 — Present</span>
                     </div>
                     <p style="margin-bottom: 15px; color: #ccc;">1mg</p>
-                    <p>Architecting data pipelines and deriving marketing insights. Optimizing high-velocity data flow.</p>
+                    <p>Architecting data pipelines and deriving marketing insights Optimizing high-velocity data flow.</p>
                 </div>
             </div>
             <div class="spotlight-card">
@@ -316,7 +325,6 @@
         function getDiffCategory(diffStr) {
             if(!diffStr) return 'unknown';
             const s = diffStr.toLowerCase().trim();
-            // Check for single letters or full words
             if(s === 'l' || s === 'easy') return 'easy';
             if(s === 'm' || s === 'med' || s === 'medium') return 'medium';
             if(s === 'h' || s === 'hard') return 'hard';
@@ -334,12 +342,27 @@
                 
                 // UPDATE UI
                 document.getElementById('total-count').innerText = `${allProblems.length} Solved`;
+                populateTopicSelect(allProblems);
                 updateDashboardStats(allProblems);
                 renderTable(allProblems);
 
             } catch (err) {
                 document.getElementById('problem-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#555;">Could not load data. Run Python Script.</td></tr>`;
             }
+        }
+
+        // NEW: Populate Dropdown Dynamically
+        function populateTopicSelect(data) {
+            const select = document.getElementById('topicSelect');
+            // Extract unique topics, remove duplicates, sort alphabetically
+            const topics = [...new Set(data.map(p => p.topic))].filter(t => t).sort();
+            
+            topics.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.innerText = t;
+                select.appendChild(opt);
+            });
         }
 
         function updateDashboardStats(data) {
@@ -377,7 +400,7 @@
             data.forEach(p => {
                 const cat = getDiffCategory(p.difficulty);
                 let diffColor = '#888'; let diffBg = 'rgba(255,255,255,0.05)';
-                let label = p.difficulty; // Keep original label
+                let label = p.difficulty;
 
                 if(cat === 'easy') { diffColor = '#4ADE80'; diffBg = 'rgba(74, 222, 128, 0.1)'; }
                 if(cat === 'medium') { diffColor = '#FACC15'; diffBg = 'rgba(250, 204, 21, 0.1)'; }
@@ -395,22 +418,28 @@
             tbody.innerHTML = html;
         }
 
-        // FILTER LOGIC (Updated to split Diff vs Topic)
-        function filterByChip(type, el) {
+        // FILTER: BY DIFFICULTY (Chips)
+        function filterByDiff(type, el) {
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
+            
+            // Reset topic select when filtering by diff
+            document.getElementById('topicSelect').value = 'all';
 
             if(type === 'all') renderTable(allProblems);
-            else if(['easy','medium','hard'].includes(type)) {
-                // Filter by Difficulty
-                renderTable(allProblems.filter(p => getDiffCategory(p.difficulty) === type));
-            } else {
-                // Filter by Topic (DP, Graph)
-                renderTable(allProblems.filter(p => p.topic.toLowerCase().includes(type) || p.name.toLowerCase().includes(type)));
-            }
+            else renderTable(allProblems.filter(p => getDiffCategory(p.difficulty) === type));
         }
 
-        // SEARCH LOGIC
+        // FILTER: BY TOPIC (Dropdown)
+        function filterByTopic(topic) {
+            // Reset chips when filtering by topic
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            
+            if(topic === 'all') renderTable(allProblems);
+            else renderTable(allProblems.filter(p => p.topic === topic));
+        }
+
+        // SEARCH
         document.getElementById('problemSearch').addEventListener('keyup', (e) => {
             const term = e.target.value.toLowerCase();
             renderTable(allProblems.filter(p => 

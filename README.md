@@ -1,4 +1,4 @@
-# ⚡ Ananth | Engineering Portfolio
+# ⚡ Ananth | Portfolio
 
 > **"Building scalable systems and analyzing data at high velocity."**
 

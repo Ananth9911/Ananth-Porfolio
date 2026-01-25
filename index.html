@@ -344,7 +344,8 @@
         async function init() {
             try {
                 // Fetch Data with Cache Busting
-                const res = await fetch('problems.json?t=' + new Date().getTime());
+                
+                const res = await fetch('https://raw.githubusercontent.com/Ananth9911/daily-coding-log/main/problems.json');
                 if(!res.ok) throw new Error();
                 allProblems = await res.json();
                 

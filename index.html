@@ -398,61 +398,81 @@
         // ============================
         //  ADVANCED HEATMAP ENGINE
         // ============================
+        // ============================
+        //  FIXED HEATMAP ENGINE (Local Time)
+        // ============================
         function renderHeatmap(data) {
             const heatmap = document.getElementById('heatmap');
             const monthContainer = document.getElementById('heatmap-months');
             const statusDisplay = document.getElementById('heatmap-status');
             const problemMap = {};
 
-            // 1. Process Data
+            // 1. Process Data (With Safety Padding)
             data.forEach(problem => {
                 const parts = problem.date.split('/'); 
                 if(parts.length === 3) {
-                    const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    // Force "1" -> "01" to match keys perfectly
+                    const y = parts[2];
+                    const m = parts[1].padStart(2, '0');
+                    const d = parts[0].padStart(2, '0');
+                    const isoDate = `${y}-${m}-${d}`;
                     problemMap[isoDate] = (problemMap[isoDate] || 0) + 1;
                 }
             });
 
-            // 2. Generate Last 52 Weeks (approx 365 days)
+            // 2. Generate Grid (Aligned to Previous Sunday)
             const today = new Date();
-            // We want to start from 52 weeks ago to today
             const startOfChart = new Date();
-            startOfChart.setDate(today.getDate() - 364);
+            startOfChart.setDate(today.getDate() - 365);
+            
+            // Back up to the nearest Sunday so columns line up
+            startOfChart.setDate(startOfChart.getDate() - startOfChart.getDay());
 
             let currentLoopDate = new Date(startOfChart);
             let weeks = [];
             
-            // Build 53 columns (Weeks)
+            // Build 53 Weeks
             for(let w=0; w<53; w++) {
-                let weekData = {
-                    days: [],
-                    monthName: ""
-                };
+                let weekData = { days: [], monthName: "" };
 
-                // Check Month for Label
-                if (w === 0 || currentLoopDate.getDate() <= 7) {
+                // Month Label (If this week starts a new month)
+                if (currentLoopDate.getDate() <= 7) {
                     weekData.monthName = currentLoopDate.toLocaleString('default', { month: 'short' });
                 }
 
-                // Build 7 Days for this week
+                // Build 7 Days
                 for(let d=0; d<7; d++) {
-                    const dateStr = currentLoopDate.toISOString().split('T')[0];
+                    // THE FIX: Use Local Time, NOT ISOString (No UTC Shift)
+                    const y = currentLoopDate.getFullYear();
+                    const m = String(currentLoopDate.getMonth() + 1).padStart(2, '0');
+                    const dayNum = String(currentLoopDate.getDate()).padStart(2, '0');
+                    const dateStr = `${y}-${m}-${dayNum}`;
+                    
                     const displayDate = currentLoopDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                    const count = problemMap[dateStr] || 0;
+                    
+                    // Don't show future data if the loop goes too far
+                    let count = 0;
+                    if (currentLoopDate <= today) {
+                        count = problemMap[dateStr] || 0;
+                    }
                     
                     weekData.days.push({ count, displayDate });
                     
-                    // Increment Day
+                    // Next Day
                     currentLoopDate.setDate(currentLoopDate.getDate() + 1);
                 }
                 weeks.push(weekData);
             }
 
             // 3. Render DOM
+            // Clear previous renders to prevent duplicates
+            heatmap.innerHTML = '';
+            monthContainer.innerHTML = '';
+
             // Render Months
             weeks.forEach(week => {
                 const mLabel = document.createElement('div');
-                mLabel.style.flex = "1"; // Auto width
+                mLabel.style.flex = "1";
                 mLabel.innerText = week.monthName; 
                 monthContainer.appendChild(mLabel);
             });
@@ -478,6 +498,12 @@
                     cell.onmouseenter = () => {
                         statusDisplay.innerHTML = `<span style="color:#39d353">${day.count} Problems</span> on ${day.displayDate}`;
                         statusDisplay.style.color = "#fff";
+                    };
+                    
+                    // Reset on leave (Optional)
+                    cell.onmouseleave = () => {
+                         statusDisplay.innerText = "Last 365 Days";
+                         statusDisplay.style.color = "#888";
                     };
 
                     col.appendChild(cell);

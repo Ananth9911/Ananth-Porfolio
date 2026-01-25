@@ -12,31 +12,33 @@
            CORE VARIABLES
            ========================================= */
         :root {
-            --bg: #050505;
-            --surface: #121212;
-            --border: #222;
-            --text-main: #ededed;
-            --text-muted: #888;
+            --bg: #000000;
+            --surface: #111111;
+            --border: #333333;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
             --accent: #2ea44f;
-            --spotlight: rgba(255, 255, 255, 0.06);
+            --spotlight: rgba(255, 255, 255, 0.05);
         }
 
-        /* RESET & SCROLL FIXES */
-        html, body {
-            width: 100%;
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
+        /* RESET */
+        * { box-sizing: border-box; }
+
+        body {
             background-color: var(--bg);
             color: var(--text-main);
             font-family: 'Manrope', sans-serif;
-            overflow-x: hidden; /* Prevents side scroll */
-            overflow-y: auto;   /* Forces vertical scroll */
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        h1, h2, h3 { margin: 0; letter-spacing: -0.02em; }
-        p { line-height: 1.6; }
+        /* TYPOGRAPHY */
+        h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -1px; }
+        p { line-height: 1.6; color: var(--text-muted); }
+        a { text-decoration: none; color: inherit; }
         
+        /* CONTAINER */
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -44,7 +46,7 @@
         }
 
         /* =========================================
-           HERO SECTION
+           HERO SECTION (No Animation - Solid Text)
            ========================================= */
         .hero-section {
             padding: 120px 0 80px 0;
@@ -53,24 +55,32 @@
             justify-content: center;
         }
 
+        .hero-sub {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
         .hero-text {
-            font-size: 12vw; /* Responsive huge text */
-            font-weight: 800;
-            line-height: 0.9;
-            background: linear-gradient(to bottom, #fff, #555);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            /* SOLID WHITE COLOR - NO GRADIENT RISKS */
+            color: #ffffff; 
+            font-size: 5rem;
+            line-height: 1;
             margin-bottom: 20px;
         }
 
-        @media (min-width: 768px) {
-            .hero-text { font-size: 6rem; } /* Cap size on desktop */
+        /* Responsive Text Size */
+        @media (max-width: 768px) {
+            .hero-text { font-size: 3.5rem; }
         }
 
-        .hero-sub {
-            font-size: 1.2rem;
+        .hero-desc {
+            font-size: 1.3rem;
             color: var(--text-muted);
-            max-width: 500px;
+            max-width: 600px;
         }
 
         .btn-group { 
@@ -80,61 +90,21 @@
         }
 
         /* =========================================
-           CARDS (Stable Glow)
+           CARDS (Simple & Stable)
            ========================================= */
-        .card-grid {
-            display: grid;
-            gap: 24px;
-        }
-        
-        @media (min-width: 768px) {
-            .card-grid-2 { grid-template-columns: 1fr 1fr; }
-        }
-
         .interactive-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 24px;
+            border-radius: 20px;
             padding: 30px;
-            position: relative;
-            overflow: hidden; /* Keeps glow inside */
-            transition: transform 0.2s ease, border-color 0.2s;
             margin-bottom: 24px;
-            
-            /* Spotlight Initials */
-            --mouse-x: 50%;
-            --mouse-y: 50%;
+            transition: transform 0.2s, border-color 0.2s;
+            position: relative;
         }
 
         .interactive-card:hover {
-            border-color: #333;
-            transform: translateY(-2px);
-        }
-
-        /* The Glow Effect Layer */
-        .interactive-card::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(
-                600px circle at var(--mouse-x) var(--mouse-y),
-                var(--spotlight),
-                transparent 40%
-            );
-            opacity: 0; /* Hidden by default */
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .interactive-card:hover::before {
-            opacity: 1; /* Show on hover */
-        }
-        
-        /* Content z-index fix */
-        .card-content {
-            position: relative;
-            z-index: 2;
+            border-color: #555;
+            transform: translateY(-3px);
         }
 
         /* =========================================
@@ -142,11 +112,12 @@
            ========================================= */
         .section-title {
             font-size: 2.5rem;
-            font-weight: 700;
             margin: 80px 0 40px 0;
-            color: #333;
+            color: #fff;
+            border-bottom: 1px solid #222;
+            padding-bottom: 20px;
         }
-        .section-title span { color: #fff; }
+        .section-title span { color: var(--accent); }
 
         .metric-row {
             display: flex;
@@ -160,47 +131,30 @@
             align-items: center;
             gap: 8px;
             padding: 6px 14px;
-            background: rgba(46, 164, 79, 0.1);
+            background: rgba(46, 164, 79, 0.15);
             color: #2ea44f;
             border-radius: 50px;
             font-size: 0.8rem;
-            font-weight: 600;
+            font-weight: 700;
         }
+        
         .pulse {
             width: 8px; height: 8px;
             background: #2ea44f;
             border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(46, 164, 79, 0.7);
-            animation: pulse-green 2s infinite;
-        }
-
-        /* PROGRESS BAR */
-        .progress-container {
-            height: 4px;
-            background: #222;
-            border-radius: 2px;
-            width: 100%;
-            margin-top: 30px;
-        }
-        .progress-bar {
-            height: 100%;
-            background: #fff;
-            width: 15%; /* Static width for stability */
-            box-shadow: 0 0 10px rgba(255,255,255,0.3);
         }
 
         /* BUTTONS */
         .btn {
-            padding: 12px 28px;
+            padding: 12px 30px;
             border-radius: 100px;
             font-weight: 600;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: 0.2s;
+            font-size: 1rem;
+            border: 1px solid transparent;
         }
         .btn-primary { background: #fff; color: #000; }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-ghost { border: 1px solid #333; color: #fff; }
+        .btn-primary:hover { background: #ddd; }
+        .btn-ghost { border-color: #444; color: #fff; }
         .btn-ghost:hover { border-color: #fff; }
 
         /* TAGS */
@@ -209,6 +163,154 @@
             color: #ccc;
             padding: 6px 14px;
             border-radius: 100px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             display: inline-block;
-            margin: 0
+            margin: 0 4px 8px 0;
+        }
+
+        /* GRID */
+        .card-grid { display: grid; gap: 24px; }
+        @media (min-width: 768px) {
+            .card-grid-2 { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* PROGRESS BAR */
+        .progress-bg {
+            width: 100%;
+            height: 4px;
+            background: #222;
+            margin-top: 30px;
+            border-radius: 2px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #fff;
+            width: 15%; /* Static width so it's always visible */
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero-section container">
+        <div class="hero-sub">Software Engineer</div>
+        <h1 class="hero-text">ANANTH</h1>
+        <p class="hero-desc">
+            Building scalable systems and analyzing data at high velocity.
+        </p>
+
+        <div class="btn-group">
+            <a href="./resume.pdf" target="_blank" class="btn btn-primary">Resume</a>
+            <a href="https://github.com/ananth9911" target="_blank" class="btn btn-ghost">GitHub</a>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title">System <span>Velocity</span></h2>
+        
+        <div class="interactive-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div>
+                    <h3 style="font-size: 1.5rem;">Engineering Output</h3>
+                    <p style="margin-top: 5px; font-size: 0.9rem;">Live Telemetry</p>
+                </div>
+                <div class="status-badge">
+                    <div class="pulse"></div>
+                    Online
+                </div>
+            </div>
+
+            <div class="metric-row">
+                <div style="flex: 1; min-width: 280px;">
+                    <img src="https://github-readme-stats.vercel.app/api?username=ananth9911&show_icons=true&theme=dark&bg_color=00000000&hide_border=true&title_color=ffffff&text_color=cccccc&icon_color=2ea44f" 
+                         style="width: 100%;" alt="Stats">
+                </div>
+                <div style="flex: 1; min-width: 200px; text-align: center;">
+                    <img src="https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/topic_breakdown.png" 
+                         style="width: 100%; max-width: 220px; border-radius: 12px; opacity: 0.9;" alt="Focus Areas">
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <p style="font-size: 0.8rem; text-transform: uppercase; margin-bottom: 15px; color: #666;">Daily Activity Log</p>
+                <img src="https://ghchart.rshah.org/2ea44f/ananth9911" 
+                     style="width: 100%; opacity: 0.9;" alt="Heatmap">
+            </div>
+
+            <div class="progress-bg">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title">Career <span>History</span></h2>
+        
+        <div class="card-grid">
+            <div class="interactive-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
+                    <h3 style="font-size: 1.3rem;">Software Engineer I</h3>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">2024 — Present</span>
+                </div>
+                <p>
+                    Architecting data pipelines and deriving marketing insights for global retail giants. 
+                    Optimizing high-velocity data flow for critical business decisions.
+                </p>
+            </div>
+
+            <div class="interactive-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
+                    <h3 style="font-size: 1.3rem;">Analyst</h3>
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">2022 — 2023</span>
+                </div>
+                <p style="color: #fff; margin-bottom: 10px; font-weight: 700;">Tredence Inc.</p>
+                <p>
+                    Executed data engineering tasks and supported customer analytics initiatives. 
+                    Built visualization layers for stakeholder reporting.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" style="padding-bottom: 100px;">
+        <h2 class="section-title">Technical <span>Builds</span></h2>
+        
+        <div class="card-grid card-grid-2">
+            
+            <div class="interactive-card">
+                <h3 style="margin-bottom: 20px;">Arsenal</h3>
+                <div style="margin-bottom: 30px;">
+                    <span class="skill-tag">C++</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">Java</span>
+                    <span class="skill-tag">SQL</span>
+                </div>
+                <h3 style="margin-bottom: 20px;">Competitive</h3>
+                <div>
+                    <span class="skill-tag" style="background: #fff; color: #000; border-color: #fff; font-weight: 700;">CodeChef 4★ (1940)</span>
+                    <span class="skill-tag">Global Rank 129</span>
+                </div>
+            </div>
+
+            <div class="interactive-card">
+                <h3 style="margin-bottom: 20px;">Projects</h3>
+                
+                <div style="margin-bottom: 30px;">
+                    <h4 style="font-size: 1.1rem; margin-bottom: 5px; color: #fff;">Inventory System</h4>
+                    <p style="font-size: 0.9rem;">Full-stack retail operations tool with automated GST.</p>
+                </div>
+
+                <div>
+                    <h4 style="font-size: 1.1rem; margin-bottom: 5px; color: #fff;">Encrypted Diary</h4>
+                    <p style="font-size: 0.9rem;">Secure note storage with custom MD5 hashing.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 60px 0; color: #444; font-size: 0.9rem;">
+        &copy; 2026 Ananth. Designed for Performance.
+    </footer>
+
+</body>
+</html>

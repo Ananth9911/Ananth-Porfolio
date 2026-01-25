@@ -116,15 +116,15 @@
         .stat-legend { display: flex; gap: 20px; font-size: 0.8rem; margin-top: 10px; color: #888; }
         .stat-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
 
+        /* STATIC TAGS (Replaced Marquee) */
+        .tag-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tag { border: 1px solid #333; color: #ccc; padding: 8px 16px; border-radius: 50px; font-size: 0.9rem; transition: 0.3s; }
+        .spotlight-card:hover .tag { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
+
         /* ANIMATIONS */
         @keyframes textFocus { 0% { filter: blur(20px); opacity: 0; } 100% { filter: blur(0px); opacity: 1; } }
         @keyframes fadeUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .status-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 10px var(--primary); }
-
-        /* MARQUEE */
-        .marquee-content { display: inline-flex; gap: 15px; animation: scroll 15s linear infinite; padding-left: 15px; }
-        .tag { border: 1px solid #333; color: #ccc; padding: 6px 12px; border-radius: 50px; font-size: 0.8rem; }
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         @media (max-width: 768px) { .hero h1 { font-size: 15vw; } }
     </style>
@@ -273,20 +273,13 @@
 
     <section class="container" style="padding-bottom: 60px;">
         <h2 class="section-header">Arsenal</h2>
-        <div class="spotlight-card" style="overflow: hidden; white-space: nowrap; padding: 40px 0;">
-            <div class="marquee-container" style="display: flex; gap: 15px; width: max-content;">
-                <div class="marquee-content">
-                    <span class="tag">C++</span> <span class="tag">Python</span> <span class="tag">Java</span>
-                    <span class="tag">SQL</span> <span class="tag">System Design</span> <span class="tag">DBMS</span>
-                    <span class="tag">Data Structures</span> <span class="tag">Algorithms</span> <span class="tag">BigQuery</span>
-                    <span class="tag">React</span> <span class="tag">Node.js</span>
-                </div>
-                <div class="marquee-content">
-                    <span class="tag">C++</span> <span class="tag">Python</span> <span class="tag">Java</span>
-                    <span class="tag">SQL</span> <span class="tag">System Design</span> <span class="tag">DBMS</span>
-                    <span class="tag">Data Structures</span> <span class="tag">Algorithms</span> <span class="tag">BigQuery</span>
-                    <span class="tag">React</span> <span class="tag">Node.js</span>
-                </div>
+        <div class="spotlight-card">
+            <div class="tag-container">
+                <span class="tag">Java</span>
+                <span class="tag">C++</span>
+                <span class="tag">Python</span>
+                <span class="tag">DSA</span>
+                <span class="tag">SQL</span>
             </div>
         </div>
     </section>
@@ -309,7 +302,7 @@
     </footer>
 
     <script>
-        // 1. SPOTLIGHT EFFECT
+        // 1. SPOTLIGHT
         const cards = document.querySelectorAll(".spotlight-card");
         document.body.onmousemove = e => {
             cards.forEach(card => {
@@ -319,48 +312,56 @@
             });
         }
 
-        // 2. DATA ENGINE
+        // 2. HELPER: Normalize Difficulty (The Fix)
+        function getDiffCategory(diffStr) {
+            if(!diffStr) return 'unknown';
+            const s = diffStr.toLowerCase().trim();
+            // Check for single letters or full words
+            if(s === 'l' || s === 'easy') return 'easy';
+            if(s === 'm' || s === 'med' || s === 'medium') return 'medium';
+            if(s === 'h' || s === 'hard') return 'hard';
+            return 'unknown';
+        }
+
+        // 3. DATA ENGINE
         let allProblems = [];
 
         async function init() {
             try {
-                // Fetch Data
                 const res = await fetch('https://raw.githubusercontent.com/ananth9911/daily-coding-log/main/problems.json');
                 if(!res.ok) throw new Error();
                 allProblems = await res.json();
                 
-                // Update UI
+                // UPDATE UI
                 document.getElementById('total-count').innerText = `${allProblems.length} Solved`;
                 updateDashboardStats(allProblems);
                 renderTable(allProblems);
 
             } catch (err) {
-                console.log(err);
                 document.getElementById('problem-table-body').innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#555;">Could not load data. Run Python Script.</td></tr>`;
             }
         }
 
-        // 3. DASHBOARD STATS LOGIC
         function updateDashboardStats(data) {
-            // Calculate Splits
-            let easy = data.filter(p => p.difficulty.toLowerCase().includes('easy')).length;
-            let med = data.filter(p => p.difficulty.toLowerCase().includes('medium')).length;
-            let hard = data.filter(p => p.difficulty.toLowerCase().includes('hard')).length;
+            // Count using new helper
+            let easy = data.filter(p => getDiffCategory(p.difficulty) === 'easy').length;
+            let med = data.filter(p => getDiffCategory(p.difficulty) === 'medium').length;
+            let hard = data.filter(p => getDiffCategory(p.difficulty) === 'hard').length;
             let total = easy + med + hard || 1;
 
-            // Update Legend Numbers
+            // Update Text
             document.getElementById('count-easy').innerText = easy;
             document.getElementById('count-med').innerText = med;
             document.getElementById('count-hard').innerText = hard;
 
-            // Animate Progress Bar
+            // Animate Bars
             setTimeout(() => {
                 document.getElementById('bar-easy').style.width = `${(easy/total)*100}%`;
                 document.getElementById('bar-med').style.width = `${(med/total)*100}%`;
                 document.getElementById('bar-hard').style.width = `${(hard/total)*100}%`;
             }, 500);
 
-            // Update Latest Activity
+            // Latest Mission
             if(data.length > 0) {
                 const last = document.getElementById('last-active');
                 last.innerHTML = `Latest: <b>${data[0].name}</b> (${data[0].date})`;
@@ -368,56 +369,58 @@
             }
         }
 
-        // 4. TABLE RENDER LOGIC
         function renderTable(data) {
             const tbody = document.getElementById('problem-table-body');
             if(data.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#555;">No matches.</td></tr>`; return; }
             
             let html = '';
             data.forEach(p => {
+                const cat = getDiffCategory(p.difficulty);
                 let diffColor = '#888'; let diffBg = 'rgba(255,255,255,0.05)';
-                if(p.difficulty.toLowerCase().includes('easy')) { diffColor = '#4ADE80'; diffBg = 'rgba(74, 222, 128, 0.1)'; }
-                if(p.difficulty.toLowerCase().includes('medium')) { diffColor = '#FACC15'; diffBg = 'rgba(250, 204, 21, 0.1)'; }
-                if(p.difficulty.toLowerCase().includes('hard')) { diffColor = '#F87171'; diffBg = 'rgba(248, 113, 113, 0.1)'; }
+                let label = p.difficulty; // Keep original label
+
+                if(cat === 'easy') { diffColor = '#4ADE80'; diffBg = 'rgba(74, 222, 128, 0.1)'; }
+                if(cat === 'medium') { diffColor = '#FACC15'; diffBg = 'rgba(250, 204, 21, 0.1)'; }
+                if(cat === 'hard') { diffColor = '#F87171'; diffBg = 'rgba(248, 113, 113, 0.1)'; }
 
                 html += `
                     <tr style="border-bottom: 1px solid #1a1a1a;">
                         <td style="padding: 16px 25px; color: #666; font-family: monospace;">${p.date}</td>
                         <td style="padding: 16px 25px; font-weight: 600; color: #fff;"><span style="color: #39d353; margin-right: 8px;">✓</span> ${p.name}</td>
                         <td style="padding: 16px 25px;"><span style="border: 1px solid #333; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; color: #ccc;">${p.topic}</span></td>
-                        <td style="padding: 16px 25px;"><span style="color: ${diffColor}; background: ${diffBg}; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${p.difficulty}</span></td>
+                        <td style="padding: 16px 25px;"><span style="color: ${diffColor}; background: ${diffBg}; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">${label}</span></td>
                         <td style="padding: 16px 25px; color: #666;">${p.source}</td>
                     </tr>`;
             });
             tbody.innerHTML = html;
         }
 
-        // 5. FILTER CHIP LOGIC
+        // FILTER LOGIC (Updated to split Diff vs Topic)
         function filterByChip(type, el) {
-            // Highlight active chip
             document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
 
-            // Filter Data
             if(type === 'all') renderTable(allProblems);
             else if(['easy','medium','hard'].includes(type)) {
-                renderTable(allProblems.filter(p => p.difficulty.toLowerCase().includes(type)));
+                // Filter by Difficulty
+                renderTable(allProblems.filter(p => getDiffCategory(p.difficulty) === type));
             } else {
+                // Filter by Topic (DP, Graph)
                 renderTable(allProblems.filter(p => p.topic.toLowerCase().includes(type) || p.name.toLowerCase().includes(type)));
             }
         }
 
-        // 6. SEARCH LOGIC
+        // SEARCH LOGIC
         document.getElementById('problemSearch').addEventListener('keyup', (e) => {
             const term = e.target.value.toLowerCase();
             renderTable(allProblems.filter(p => 
                 p.name.toLowerCase().includes(term) || 
                 p.topic.toLowerCase().includes(term) || 
-                p.difficulty.toLowerCase().includes(term)
+                getDiffCategory(p.difficulty).includes(term)
             ));
         });
 
-        // 7. COPY EMAIL
+        // COPY EMAIL
         function copyEmail() {
             navigator.clipboard.writeText("ananthj43@gmail.com");
             const display = document.getElementById("email-display");

@@ -14,7 +14,7 @@
     
     <meta name="description" content="Portfolio of Ananth | Software Engineer. High-velocity data systems & algorithmic problem solving.">
     <meta property="og:title" content="Ananth | Software Engineer">
-    <meta property="og:description" content="Building scalable systems and analyzing data at high velocity. 150+ DSA Problems Solved.">
+    <meta property="og:description" content="Building scalable systems and analyzing data at high velocity. 434+ DSA Problems Solved. Building systems at high velocity.">
     <meta property="og:image" content="https://raw.githubusercontent.com/Ananth9911/daily-coding-log/main/topic_breakdown.png">
     <meta property="og:url" content="https://ananth9911.github.io">
     <meta name="theme-color" content="#39d353">
@@ -302,6 +302,7 @@
                     <h2 class="section-header" style="margin: 0; font-size: 2rem;">Solved Archive</h2>
                     <span id="total-count" style="background: rgba(57, 211, 83, 0.1); color: #39d353; padding: 4px 12px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(57, 211, 83, 0.2);">Loading...</span>
                     <span id="mastery-count" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 4px 12px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2); display:none">—</span>
+                    <span id="streak-count" style="background: rgba(249, 115, 22, 0.1); color: #f97316; padding: 4px 12px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; border: 1px solid rgba(249, 115, 22, 0.2); display:none">—</span>
                 </div>
             </div>
             
@@ -324,7 +325,6 @@
                             <th style="padding: 18px 25px; color: #888; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Problem</th>
                             <th style="padding: 18px 25px; color: #888; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Topic</th>
                             <th style="padding: 18px 25px; color: #888; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; text-align:center;">Diff</th>
-                            <th style="padding: 18px 25px; color: #888; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Pattern</th>
                         </tr>
                     </thead>
                     <tbody id="problem-table-body">
@@ -434,11 +434,28 @@
 
                 renderTable(allProblems);
                 renderHeatmap(allProblems);
-                // Compute mastery
-                const smooth = allProblems.filter(p => p.friction && p.friction.toLowerCase().includes('smooth')).length;
-                const mastery = allProblems.length > 0 ? Math.round((smooth/allProblems.length)*100) : 0;
+                // Compute mastery (of reviewed problems only)
+                const reviewed = allProblems.filter(p => p.lastSolved && p.lastSolved !== 'Never' && p.lastSolved !== '');
+                const smooth = reviewed.filter(p => p.friction && p.friction.toLowerCase().includes('smooth')).length;
+                const mastery = reviewed.length > 0 ? Math.round((smooth/reviewed.length)*100) : 0;
                 const mc = document.getElementById('mastery-count');
-                if(mc){mc.textContent = mastery+'% smooth';mc.style.display='inline-block';}
+                if(mc){
+                  mc.textContent = reviewed.length < 5 ? allProblems.length + ' Problems Solved' : mastery + '% SRS Smooth';
+                  mc.style.display='inline-block';
+                }
+                
+                // Compute streak
+                const dateSet = new Set(allProblems.map(p => p.lastSolved).filter(d => d && d !== 'Never' && d !== ''));
+                let streak = 0;
+                const ref = new Date();
+                for(let i=0; i<365; i++){
+                  const d = new Date(ref); d.setDate(ref.getDate()-i);
+                  const k = d.toISOString().split('T')[0];
+                  if(dateSet.has(k)) streak++;
+                  else if(i > 0) break;
+                }
+                const sc = document.getElementById('streak-count');
+                if(sc && streak > 0){ sc.textContent = '🔥 ' + streak + 'd streak'; sc.style.display='inline-block'; }
 
             } catch (err) {
                 console.error(err);

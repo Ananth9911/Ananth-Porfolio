@@ -73,7 +73,7 @@
         .hero p, .hero-badges { opacity: 0; animation: fadeUp 1s ease 0.5s forwards; }
         .hero-badges { display: flex; gap: 15px; margin-top: 40px; }
         /* CARDS */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 40px; align-items: stretch; }
         .spotlight-card {
             background-color: var(--card-bg); border: 1px solid var(--border);
             border-radius: 16px; padding: 40px; position: relative; overflow: hidden;
@@ -196,8 +196,8 @@
     </div>
     
     <div class="card-grid">
-        <a href="https://ananth9911.github.io/daily-coding-log/plan.html" target="_blank" style="text-decoration: none;">
-            <div class="spotlight-card">
+        <a href="https://ananth9911.github.io/daily-coding-log/plan.html" target="_blank" style="text-decoration: none; display: flex;">
+            <div class="spotlight-card" style="width:100%;">
                 <div class="card-content">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="color: #fff; font-size: 1.1rem; font-family: 'IBM Plex Mono', monospace;">> curriculum_orchestrator.sh</h3>
@@ -211,14 +211,14 @@
                 </div>
             </div>
         </a>
-        <a href="https://ananth9911.github.io/daily-coding-log/review.html" target="_blank" style="text-decoration: none;">
-            <div class="spotlight-card">
+        <a href="https://ananth9911.github.io/daily-coding-log/review.html" target="_blank" style="text-decoration: none; display: flex;">
+            <div class="spotlight-card" style="width:100%;">
                 <div class="card-content">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3 style="color: #fff; font-size: 1.1rem; font-family: 'IBM Plex Mono', monospace;">> persistence_engine.io</h3>
                         <span style="color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem;">[ OPTIMIZED ]</span>
                     </div>
-                    <p style="font-size: 0.85rem; line-height: 1.5;">A personal SM-2 adaptive review engine. Each problem carries its own Ease Factor (EF) and interval, updated per session using a Smooth/Struggled binary signal. Queue built daily as 5 retention + 3 fresh problems.</p>
+                    <p style="font-size: 0.85rem; line-height: 1.5;">SM-2 adaptive review engine with per-problem Ease Factor. Smooth/Struggled signal updates EF and interval each session. Daily queue: 5 retention + 3 fresh.</p>
                     <div style="margin-top: 15px; font-size: 0.7rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace;">
                         Algorithm: SM-2_Hybrid · EF_per_problem<br>
                         Queue: 5_retention + 3_fresh · daily
@@ -409,9 +409,8 @@
                   mc.style.display='inline-block';
                 }
                 
-                // STREAK FIX v2: tolerates 1-day sync lag
-                // problems.json may be up to 1 day behind GitHub sync
-                // so we allow streak to start from yesterday if today has no data
+                // Compute streak from p.date (same source as heatmap)
+                // p.date is in dd/MM/yyyy format — parse it the same way as renderHeatmap
                 const streakDateSet = new Set();
                 allProblems.forEach(p => {
                     const parts = p.date ? p.date.split('/') : [];
@@ -422,23 +421,17 @@
                         streakDateSet.add(`${y}-${m}-${d}`);
                     }
                 });
-                function fmtKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-                const todayRef = new Date();
-                const todayK = fmtKey(todayRef);
-                const yestRef = new Date(todayRef); yestRef.setDate(todayRef.getDate()-1);
-                const yestK = fmtKey(yestRef);
-                // If no data today AND no data yesterday, streak truly broken
-                let startRef = null;
-                if(streakDateSet.has(todayK)) startRef = todayRef;
-                else if(streakDateSet.has(yestK)) startRef = yestRef; // allow 1-day sync lag
                 let streak = 0;
-                if(startRef){
-                  for(let i=0; i<730; i++){
-                    const d = new Date(startRef); d.setDate(startRef.getDate()-i);
-                    const k = fmtKey(d);
-                    if(streakDateSet.has(k)) streak++;
-                    else if(i > 0) break;
-                  }
+                const ref = new Date();
+                for(let i=0; i<730; i++){
+                  const d = new Date(ref); d.setDate(ref.getDate()-i);
+                  // Use local date (same fix as heatmap)
+                  const y2 = d.getFullYear();
+                  const m2 = String(d.getMonth()+1).padStart(2,'0');
+                  const d2 = String(d.getDate()).padStart(2,'0');
+                  const k = `${y2}-${m2}-${d2}`;
+                  if(streakDateSet.has(k)) streak++;
+                  else if(i > 0) break;
                 }
                 const sc = document.getElementById('streak-count');
                 if(sc && streak > 0){ sc.textContent = '🔥 ' + streak + 'd streak'; sc.style.display='inline-block'; }

@@ -409,8 +409,8 @@
                   mc.style.display='inline-block';
                 }
                 
-                // Compute streak from p.date (same source as heatmap)
-                // p.date is in dd/MM/yyyy format — parse it the same way as renderHeatmap
+                // FIX: Streak tolerates 1-day sync lag (problems.json may be 1 day behind)
+                // Counts backward from today; if today has no data, also allows yesterday as start
                 const streakDateSet = new Set();
                 allProblems.forEach(p => {
                     const parts = p.date ? p.date.split('/') : [];
@@ -421,17 +421,26 @@
                         streakDateSet.add(`${y}-${m}-${d}`);
                     }
                 });
+                function fmtDateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+                const todayRef = new Date();
+                const todayK = fmtDateKey(todayRef);
+                const yesterdayRef = new Date(todayRef); yesterdayRef.setDate(todayRef.getDate()-1);
+                const yesterdayK = fmtDateKey(yesterdayRef);
+                let startRef = todayRef;
+                // If no data today AND no data yesterday → streak truly broken
+                if(!streakDateSet.has(todayK) && !streakDateSet.has(yesterdayK)){
+                  startRef = null;
+                } else if(!streakDateSet.has(todayK)){
+                  startRef = yesterdayRef; // sync lag: start from yesterday
+                }
                 let streak = 0;
-                const ref = new Date();
-                for(let i=0; i<730; i++){
-                  const d = new Date(ref); d.setDate(ref.getDate()-i);
-                  // Use local date (same fix as heatmap)
-                  const y2 = d.getFullYear();
-                  const m2 = String(d.getMonth()+1).padStart(2,'0');
-                  const d2 = String(d.getDate()).padStart(2,'0');
-                  const k = `${y2}-${m2}-${d2}`;
-                  if(streakDateSet.has(k)) streak++;
-                  else if(i > 0) break;
+                if(startRef){
+                  for(let i=0; i<730; i++){
+                    const d = new Date(startRef); d.setDate(startRef.getDate()-i);
+                    const k = fmtDateKey(d);
+                    if(streakDateSet.has(k)) streak++;
+                    else if(i > 0) break;
+                  }
                 }
                 const sc = document.getElementById('streak-count');
                 if(sc && streak > 0){ sc.textContent = '🔥 ' + streak + 'd streak'; sc.style.display='inline-block'; }

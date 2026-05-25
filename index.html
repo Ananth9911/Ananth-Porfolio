@@ -409,8 +409,9 @@
                   mc.style.display='inline-block';
                 }
                 
-                // FIX: Streak tolerates 1-day sync lag (problems.json may be 1 day behind)
-                // Counts backward from today; if today has no data, also allows yesterday as start
+                // STREAK FIX v2: tolerates 1-day sync lag
+                // problems.json may be up to 1 day behind GitHub sync
+                // so we allow streak to start from yesterday if today has no data
                 const streakDateSet = new Set();
                 allProblems.forEach(p => {
                     const parts = p.date ? p.date.split('/') : [];
@@ -421,23 +422,20 @@
                         streakDateSet.add(`${y}-${m}-${d}`);
                     }
                 });
-                function fmtDateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+                function fmtKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
                 const todayRef = new Date();
-                const todayK = fmtDateKey(todayRef);
-                const yesterdayRef = new Date(todayRef); yesterdayRef.setDate(todayRef.getDate()-1);
-                const yesterdayK = fmtDateKey(yesterdayRef);
-                let startRef = todayRef;
-                // If no data today AND no data yesterday → streak truly broken
-                if(!streakDateSet.has(todayK) && !streakDateSet.has(yesterdayK)){
-                  startRef = null;
-                } else if(!streakDateSet.has(todayK)){
-                  startRef = yesterdayRef; // sync lag: start from yesterday
-                }
+                const todayK = fmtKey(todayRef);
+                const yestRef = new Date(todayRef); yestRef.setDate(todayRef.getDate()-1);
+                const yestK = fmtKey(yestRef);
+                // If no data today AND no data yesterday, streak truly broken
+                let startRef = null;
+                if(streakDateSet.has(todayK)) startRef = todayRef;
+                else if(streakDateSet.has(yestK)) startRef = yestRef; // allow 1-day sync lag
                 let streak = 0;
                 if(startRef){
                   for(let i=0; i<730; i++){
                     const d = new Date(startRef); d.setDate(startRef.getDate()-i);
-                    const k = fmtDateKey(d);
+                    const k = fmtKey(d);
                     if(streakDateSet.has(k)) streak++;
                     else if(i > 0) break;
                   }

@@ -10,7 +10,7 @@
 
 ## 🚀 About The Project
 
-This is not just a static HTML page. It is a **"Headless" Portfolio System** designed to track my engineering velocity in real-time.
+This is not just a static HTML page. It is a **Portfolio System** designed to track my velocity in real-time.
 
 Most portfolios are static and outdated the moment they are deployed. This system connects to a **Python Automation Engine** that reads my daily problem-solving logs, processes the data, and pushes live updates to the UI without me touching a single line of frontend code.
 

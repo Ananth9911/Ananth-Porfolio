@@ -490,16 +490,27 @@ function countUp(el, to, suffix) {
     el.innerHTML = Math.round(to * e).toLocaleString('en-IN') + (suffix || ''); if (p < 1) requestAnimationFrame(f); })(t0);
 }
 let ALL = [];
-fetch(SRC, { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(data => {
+const ACT = 'https://raw.githubusercontent.com/Ananth9911/daily-coding-log/main/activity.json';
+let REV = {};
+Promise.all([
+  fetch(SRC, { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
+  fetch(ACT, { cache: 'no-store' }).then(r => r.ok ? r.json() : {}).catch(() => ({}))          // optional
+]).then(([data, act]) => {
   ALL = (Array.isArray(data) ? data : []).map(p => Object.assign({}, p, { iso: toISO(p.date) })).filter(p => p.iso);
+  REV = act && typeof act === 'object' && !Array.isArray(act) ? act : {};
   velocity();
 }).catch(() => { $('#hm-status').textContent = 'Live data unavailable right now.'; });
 
 function velocity() {
-  const byDay = {}; ALL.forEach(p => { byDay[p.iso] = (byDay[p.iso] || 0) + 1; });
+  const fresh = {}; ALL.forEach(p => { fresh[p.iso] = (fresh[p.iso] || 0) + 1; });
+  const byDay = Object.assign({}, fresh);                                  // new problems + re-solves
+  Object.keys(REV).forEach(k => { const v = +REV[k] || 0; if (v) byDay[k] = (byDay[k] || 0) + v; });
   const sorted = Object.keys(byDay).sort(); let streak = 0, run = 0, prev = null;   // longest run of consecutive days
   sorted.forEach(k => { const d = new Date(k + 'T00:00:00'); run = prev && (d - prev) === 864e5 ? run + 1 : 1; prev = d; if (run > streak) streak = run; });
-  const vals = { total: ALL.length, streak, hard: ALL.filter(p => String(p.difficulty).toUpperCase() === 'H').length, topics: new Set(ALL.map(p => p.topic).filter(Boolean)).size };
+  const key = p => String(p.name || '').trim().toLowerCase();         // re-solves count once
+  const vals = { total: new Set(ALL.map(key)).size, streak,
+    hard: new Set(ALL.filter(p => String(p.difficulty).toUpperCase() === 'H').map(key)).size,
+    topics: new Set(ALL.map(p => p.topic).filter(Boolean)).size };
   const numIO = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return;
     const el = e.target, k = el.dataset.k; countUp(el, vals[k], k === 'streak' ? '<small>days</small>' : ''); numIO.unobserve(el); }), { threshold: .5 });
   $$('.num .v').forEach(el => numIO.observe(el));
@@ -509,7 +520,7 @@ function velocity() {
   let cells = '', months = '', col = 0, lastM = -1;
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     if (d.getDay() === 0) { const m = d.getMonth(); months += `<span>${m !== lastM ? d.toLocaleString('en', { month: 'short' }) : ''}</span>`; lastM = m; col++; }
-    const k = ymd(d), n = byDay[k] || 0, lv = n === 0 ? 0 : n === 1 ? 1 : n === 2 ? 2 : n <= 4 ? 3 : 4;
+    const k = ymd(d), n = byDay[k] || 0, lv = n === 0 ? 0 : n === 1 ? 1 : n <= 3 ? 2 : n <= 7 ? 3 : 4;
     cells += `<i data-l="${lv}" data-n="${n}" data-k="${k}" style="--c:${col + d.getDay()}"></i>`;
   }
   $('#hm').innerHTML = cells; $('#hm-months').innerHTML = months;
@@ -518,7 +529,9 @@ function velocity() {
   idle();
   $('#hm').addEventListener('pointerover', e => { const cell = e.target.closest('i'); if (!cell) return;
     const d = new Date(cell.dataset.k + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-    $('#hm-status').innerHTML = `<b>${cell.dataset.n} problem${cell.dataset.n === '1' ? '' : 's'} solved</b> on ${d}`; });
+    const nw = fresh[cell.dataset.k] || 0, rv = +REV[cell.dataset.k] || 0, tot = nw + rv;
+    const split = nw && rv ? ` · ${nw} new, ${rv} re-solved` : rv ? ' · re-solved' : '';
+    $('#hm-status').innerHTML = `<b>${tot} problem${tot === 1 ? '' : 's'}</b> on ${d}${split}`; });
   $('#hm').addEventListener('pointerleave', idle);
   new IntersectionObserver(([e], o) => { if (e.isIntersecting) { $('#hm').classList.add('in'); o.disconnect(); } }, { threshold: .2 }).observe($('#hm'));
   const sc = $('.hm-scroll'); sc.scrollLeft = sc.scrollWidth;      // phones open on the most recent weeks
